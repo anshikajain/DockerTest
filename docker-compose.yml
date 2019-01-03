@@ -1,0 +1,39 @@
+version: '3'
+services:
+    redis:
+        image: "redis:3.2.4"
+        ports:
+            - "6380:6379"
+        volumes:
+            - ads-redis-datavolume:/data
+    postgres:
+        build:
+            context: .
+            dockerfile: 'Dockerfile-postgres'
+        ports:
+            - "5435:5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres1234
+            POSTGRES_DB: xaddb
+        volumes:
+            - ./docker/postgres-init:/docker-entrypoint-initdb.d
+            - ./docker/postgres:/opt/sql
+            - ads-postgres-datavolume:/var/lib/postgresql
+    mysql:
+        build:
+            context: .
+            dockerfile: 'Dockerfile-mysql'
+        ports:
+            - "3346:3306"
+        volumes:
+            - ./docker/mysql:/opt/sql
+            - ./docker/mysql-init:/docker-entrypoint-initdb.d
+            - ads-mysql-datavolume:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql1234
+
+volumes:
+    ads-mysql-datavolume:
+    ads-postgres-datavolume:
+    ads-redis-datavolume:
